@@ -1,0 +1,187 @@
+openapi: 3.0.0
+info:
+  title: sokar
+  version: '1.0'
+  description: Documentación del proyecto de sokar
+  contact:
+    name: Victor
+    email: victorlt.xd3@gmail.com
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  '/services/{service_id}/review/{review_id}':
+    parameters:
+      - schema:
+          type: string
+        name: service_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: review_id
+        in: path
+        required: true
+    get:
+      summary: Obtener el review del servicio
+      tags:
+        - services
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  service_id:
+                    type: number
+                  reports_service:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                        product_user_id:
+                          type: number
+                        progress:
+                          type: number
+                        status:
+                          type: string
+                        service_end:
+                          type: string
+                        service_start:
+                          type: string
+                        costs:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              description:
+                                type: string
+                              costs:
+                                type: string
+                        costs_repairs:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              repair_id:
+                                type: number
+                              cost:
+                                type: string
+              examples:
+                default:
+                  value:
+                    service_id: 10
+                    reports_service:
+                      - id: 1
+                        product_user_id: 1
+                        progress: 100
+                        status: terminado
+                        service_end: '2020-08-20'
+                        service_start: '2020-08-20'
+                        costs:
+                          - description: Compras
+                            cost: '320'
+                        costs_repairs:
+                          - repair_id: 307
+                            cost: '15'
+                          - repair_id: 243
+                            cost: '10'
+      operationId: get-services-service_id-review
+      description: Este endpoint obtiene el id del review para mostrar el detalle del mantenimiento realizado.
+  '/services/{service_id}/review':
+    parameters:
+      - schema:
+          type: string
+        name: service_id
+        in: path
+        required: true
+    post:
+      summary: Crear un review del mantenimiento
+      tags:
+        - services
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items: {}
+              examples:
+                default:
+                  value:
+                    message: La revisión fue creada correctamente
+                    data: []
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: string
+              examples:
+                default:
+                  value:
+                    message: La revisión no logró ser enviada
+                    errors:
+                      - problemas al validar el token
+                      - faltan datos
+      operationId: post-services-service_id-review
+      description: Creación de un review de servicio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token_review:
+                  type: string
+                  format: uuid
+                  example: 9090-9090-9090-9889
+                  minLength: 1
+                star:
+                  type: number
+                  minimum: 1
+                  maximum: 5
+                  example: 5
+                description:
+                  type: string
+                check_revision:
+                  type: boolean
+                  default: 'false'
+              required:
+                - token_review
+                - star
+                - description
+            examples:
+              request:
+                value:
+                  token_review: 9090-94949-94949-7373-9494
+                  star: 5
+                  description: 'El servicio estuvo perfecto, muchas gracias'
+                  check_revision: true
+          application/xml:
+            schema:
+              type: object
+              properties: {}
+        description: 'Campos que el endpoint necesita para su correcto funcionamineto, solo se puede enviar una sola vez el token_review.'
+components:
+  schemas: {}
+  securitySchemes:
+    Token:
+      type: http
+      scheme: bearer
